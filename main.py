@@ -25,7 +25,7 @@ BATCH_SIZE = 32
 POLICY_UPDATE = 4
 TARGET_UPDATE = 10_000
 WARM_STEPS = 50_000
-MAX_STEPS = 10_000_000
+MAX_STEPS = 2_500_000
 EVALUATE_FREQ = 100_000
 
 rand = random.Random()
@@ -70,8 +70,9 @@ for step in progressive:
 
     if step % POLICY_UPDATE == 0 and training:
         loss = agent.learn(memory, BATCH_SIZE)
-        with open("rewards.txt", "a") as fp:
-            fp.write(f"LOSS {step//POLICY_UPDATE:3d} {step:8d} {loss:.1f}\n")
+        if step % EVALUATE_FREQ == 0:
+            with open("rewards.txt", "a") as fp:
+                fp.write(f"LOSS {step//POLICY_UPDATE:3d} {step:8d} {loss}\n")
 
     if step % TARGET_UPDATE == 0:
         agent.sync()

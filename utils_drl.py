@@ -53,9 +53,11 @@ class Agent(object):
         self.__target.load_state_dict(self.__policy.state_dict())
         self.__optimizer = optim.Adam(
             self.__policy.parameters(),
-            lr=0.0000625,
+            lr=0.0000625 * 1.25**10,
             eps=1.5e-4,
         )
+        self.__scheduler = optim.lr_scheduler.StepLR(
+            self.__optimizer, step_size=100_000, gamma=0.8)
         self.__target.eval()
 
     def run(self, state: TensorStack4, training: bool = False) -> int:
@@ -86,6 +88,7 @@ class Agent(object):
         for param in self.__policy.parameters():
             param.grad.data.clamp_(-1, 1)
         self.__optimizer.step()
+        self.__scheduler.step()
 
         return loss.item()
 
