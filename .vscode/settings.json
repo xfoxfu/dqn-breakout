@@ -16,7 +16,7 @@
         "tqdm",
         "unsqueeze"
     ],
-    "python.pythonPath": "/home/luke/anaconda3/envs/drl/bin/python",
+    "python.pythonPath": "/usr/bin/python3.8",
     "python.linting.pylintArgs": [
         "--generated-members=numpy.* ,torch.*"
     ]

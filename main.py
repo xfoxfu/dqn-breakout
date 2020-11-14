@@ -25,12 +25,14 @@ BATCH_SIZE = 32
 POLICY_UPDATE = 4
 TARGET_UPDATE = 10_000
 WARM_STEPS = 50_000
-MAX_STEPS = 50_000_000
+MAX_STEPS = 10_000_000
 EVALUATE_FREQ = 100_000
 
 rand = random.Random()
 rand.seed(GLOBAL_SEED)
-new_seed = lambda: rand.randint(0, 1000_000)
+def new_seed(): return rand.randint(0, 1000_000)
+
+
 os.mkdir(SAVE_PREFIX)
 
 torch.manual_seed(new_seed())
@@ -67,7 +69,9 @@ for step in progressive:
     memory.push(env.make_folded_state(obs_queue), action, reward, done)
 
     if step % POLICY_UPDATE == 0 and training:
-        agent.learn(memory, BATCH_SIZE)
+        loss = agent.learn(memory, BATCH_SIZE)
+        with open("rewards.txt", "a") as fp:
+            fp.write(f"LOSS {step//POLICY_UPDATE:3d} {step:8d} {loss:.1f}\n")
 
     if step % TARGET_UPDATE == 0:
         agent.sync()
@@ -75,7 +79,8 @@ for step in progressive:
     if step % EVALUATE_FREQ == 0:
         avg_reward, frames = env.evaluate(obs_queue, agent, render=RENDER)
         with open("rewards.txt", "a") as fp:
-            fp.write(f"{step//EVALUATE_FREQ:3d} {step:8d} {avg_reward:.1f}\n")
+            fp.write(
+                f"REWD {step//EVALUATE_FREQ:3d} {step:8d} {avg_reward:.1f}\n")
         if RENDER:
             prefix = f"eval_{step//EVALUATE_FREQ:03d}"
             os.mkdir(prefix)
