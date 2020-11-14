@@ -10,7 +10,5 @@ And here are some pre-trained weights that you can play with:
 
 ## Requirements
 - torch
-- scikit-learn
-- scikit-image
 - opencv-python
 - gym
